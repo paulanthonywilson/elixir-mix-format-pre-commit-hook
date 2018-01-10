@@ -1,0 +1,23 @@
+#!/bin/sh
+#
+# An example hook script to verify what is about to be committed.
+# Place in .git/hooks
+
+cd `git rev-parse --show-toplevel`
+
+# To give clarity into whether or not the issue is formatting, we exit for modified + staged files early.
+# This might not be the _best_ behavior here.
+git status -s | grep "^MM"
+if [ $? == 0 ]; then
+   echo "Staged file is also modified. Did you mean to do this?"
+   exit 1
+fi
+
+mix format
+
+git status -s | grep "^MM"
+if [ $? == 0 ]; then
+   echo "Staged file modified during pre-commit hook as it was reformatted by elixir."
+   exit 1
+fi
+
